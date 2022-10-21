@@ -21,7 +21,7 @@ $ mkdir -p ~/some/place/for/plugins
 
 ```shell
 $ cd ~/some/place/for/plugins
-$ git clone https://github.com/deltalejo/platforms-ceedling-plugin.git
+$ git clone https://github.com/deltalejo/platforms-ceedling-plugin.git platforms
 ```
 
 ### Enable the plugin
