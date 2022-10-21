@@ -1,6 +1,6 @@
 # Platforms Ceedling Plugin
 
-Support building for multiple platforms with [Ceedling](ceedling).
+Support building for multiple platforms with [Ceedling](https://github.com/ThrowTheSwitch/Ceedling).
 
 The plugin behaves very similar to the `project:<name>` option, but allows the
 extra project files to be inside some folder that can be specified, keeping your
@@ -67,5 +67,3 @@ Call Ceedling specifying the desired platform. *e.g.*:
 ```shell
 $ ceedling platform:platform-1 test:all
 ```
-
-[ceedling]: https://github.com/ThrowTheSwitch/Ceedling
