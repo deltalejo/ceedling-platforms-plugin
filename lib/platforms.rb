@@ -1,13 +1,10 @@
 require 'ceedling/plugin'
-require 'ceedling/file_wrapper'
 require 'ceedling/yaml_wrapper'
 
-PLATFORMS_SYM = 'platforms'.to_sym
+PLATFORMS_ROOT_NAME = 'platforms'.freeze
+PLATFORMS_SYM       = PLATFORMS_ROOT_NAME.to_sym
 
 class Platforms < Plugin
-  @@file_wrapper = FileWrapper.new
-  @@yaml_wrapper = YamlWrapper.new
-  
   def setup
     config = collect_project_platforms(@ceedling[:configurator].project_config_hash)
     @ceedling[:configurator].replace_flattened_config(config)
@@ -17,7 +14,7 @@ class Platforms < Plugin
     platforms = []
     
     flat_hash[:project_platforms_paths].each do |path|
-      platforms << @@file_wrapper.directory_listing(File.join(path, '*.yml'))
+      platforms << @ceedling[:file_wrapper].directory_listing(File.join(path, '*.yml'))
     end
     
     return {
@@ -27,7 +24,7 @@ class Platforms < Plugin
   
   def platform_variants(platform)
     platform_path = COLLECTION_PROJECT_PLATFORMS.detect {|path| File.basename(path, '.yml') == platform}
-    platform_variants = @@file_wrapper.directory_listing(File.join(File.dirname(platform_path), platform, '*.yml'))
+    platform_variants = @ceedling[:file_wrapper].directory_listing(File.join(File.dirname(platform_path), platform, '*.yml'))
     return platform_variants
   end
   
@@ -43,10 +40,11 @@ class Platforms < Plugin
     
     config_paths.each do |path|
       next if path.nil?
-      config = @@yaml_wrapper.load(path)
+      config = @ceedling[:yaml_wrapper].load(path)
       config_hash.deep_merge!(config)
     end
     
+    config_hash[:plugins][:enabled].delete(PLATFORMS_ROOT_NAME)
     @ceedling[:setupinator].do_setup(config_hash)
     
     constants_to_remove.each do |const|
@@ -70,6 +68,7 @@ class Platforms < Plugin
     load(File.join(CEEDLING_LIB, 'ceedling', 'rules_release.rake')) if (flat_hash[:project_release_build])
     # load(File.join(CEEDLING_LIB, 'ceedling', 'tasks_release_deep_dependencies.rake')) if (flat_hash[:project_release_build] and flat_hash[:project_use_deep_dependencies])
     # load(File.join(CEEDLING_LIB, 'ceedling', 'tasks_release.rake')) if (flat_hash[:project_release_build])
-  end
-  
+    
+    @ceedling[:configurator].rake_plugins.each {|plugin| load(plugin)}
+  end  
 end
