@@ -53,22 +53,7 @@ class Platforms < Plugin
     
     flat_hash = @ceedling[:configurator].project_config_hash
     
-    # load(File.join(CEEDLING_LIB, 'ceedling', 'tasks_base.rake'))
-    load(File.join(CEEDLING_LIB, 'ceedling', 'tasks_filesystem.rake'))
-    # load(File.join(CEEDLING_LIB, 'ceedling', 'tasks_tests.rake'))
-    # load(File.join(CEEDLING_LIB, 'ceedling', 'tasks_vendor.rake'))
-    load(File.join(CEEDLING_LIB, 'ceedling', 'rules_tests.rake'))
-    
-    load(File.join(CEEDLING_LIB, 'ceedling', 'rules_cmock.rake')) if (flat_hash[:project_use_mocks])
-    load(File.join(CEEDLING_LIB, 'ceedling', 'rules_preprocess.rake')) if (flat_hash[:project_use_test_preprocessor])
-    load(File.join(CEEDLING_LIB, 'ceedling', 'rules_tests_deep_dependencies.rake')) if (flat_hash[:project_use_deep_dependencies])
-    # load(File.join(CEEDLING_LIB, 'ceedling', 'tasks_tests_deep_dependencies.rake')) if (flat_hash[:project_use_deep_dependencies])
-    
-    load(File.join(CEEDLING_LIB, 'ceedling', 'rules_release_deep_dependencies.rake')) if (flat_hash[:project_release_build] and flat_hash[:project_use_deep_dependencies])
-    load(File.join(CEEDLING_LIB, 'ceedling', 'rules_release.rake')) if (flat_hash[:project_release_build])
-    # load(File.join(CEEDLING_LIB, 'ceedling', 'tasks_release_deep_dependencies.rake')) if (flat_hash[:project_release_build] and flat_hash[:project_use_deep_dependencies])
-    # load(File.join(CEEDLING_LIB, 'ceedling', 'tasks_release.rake')) if (flat_hash[:project_release_build])
-    
-    @ceedling[:configurator].rake_plugins.each {|plugin| load(plugin)}
-  end  
+    Rake.application.clear
+    PROJECT_RAKEFILE_COMPONENT_FILES.each {|component| load(component)}
+  end
 end
