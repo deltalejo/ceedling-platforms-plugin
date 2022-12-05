@@ -35,25 +35,27 @@ class Platforms < Plugin
       "REMOVE_FILE_PROC",
     ]
     
-    config_hash = @ceedling[:setupinator].config_hash
-    @ceedling[:setupinator].reset_defaults(config_hash)
-    
-    config_paths.each do |path|
-      next if path.nil?
-      config = @ceedling[:yaml_wrapper].load(path)
-      config_hash.deep_merge!(config)
+    Rake.application.clear
+    @ceedling[:configurator].script_plugins.each do |plugin|
+      @ceedling.instance_variable_get(:@cache).delete(plugin.to_s)
     end
-    
-    config_hash[:plugins][:enabled].delete(PLATFORMS_ROOT_NAME)
-    @ceedling[:setupinator].do_setup(config_hash)
+    @ceedling[:plugin_manager].instance_variable_set(:@plugin_objects, [])
     
     constants_to_remove.each do |const|
       Object.send(:remove_const, const)
     end
     
-    flat_hash = @ceedling[:configurator].project_config_hash
+    platform_config = @ceedling[:setupinator].load_project_files
     
-    Rake.application.clear
+    config_paths.each do |path|
+      next if path.nil?
+      config = @ceedling[:yaml_wrapper].load(path)
+      platform_config.deep_merge!(config)
+    end
+    
+    platform_config[:plugins][:enabled].delete(PLATFORMS_ROOT_NAME)
+    @ceedling[:setupinator].do_setup(platform_config)
+    
     PROJECT_RAKEFILE_COMPONENT_FILES.each {|component| load(component)}
   end
 end
