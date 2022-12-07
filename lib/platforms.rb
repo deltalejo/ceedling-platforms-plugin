@@ -50,7 +50,7 @@ class Platforms < Plugin
     config_paths.each do |path|
       next if path.nil?
       config = @ceedling[:yaml_wrapper].load(path)
-      platform_config.deep_merge!(config)
+      platform_config = @ceedling[:project_file_loader].yaml_merger(platform_config, config)
     end
     
     platform_config[:plugins][:enabled].delete(PLATFORMS_ROOT_NAME)
