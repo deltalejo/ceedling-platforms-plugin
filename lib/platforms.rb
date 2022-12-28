@@ -40,6 +40,8 @@ class Platforms < Plugin
       @ceedling.instance_variable_get(:@cache).delete(plugin.to_s)
     end
     @ceedling[:plugin_manager].instance_variable_set(:@plugin_objects, [])
+    @ceedling[:setupinator].instance_variable_set(:@config_hash, {})
+    @ceedling[:configurator].setup
     
     constants_to_remove.each do |const|
       Object.send(:remove_const, const)
@@ -53,9 +55,11 @@ class Platforms < Plugin
       platform_config = @ceedling[:project_file_loader].yaml_merger(platform_config, config)
     end
     
+    # Avoid recursion when loading the plugin
     platform_config[:plugins][:enabled].delete(PLATFORMS_ROOT_NAME)
-    @ceedling[:setupinator].do_setup(platform_config)
     
+    @ceedling[:setupinator].do_setup(platform_config)
+    @ceedling[:plugin_manager].pre_build
     PROJECT_RAKEFILE_COMPONENT_FILES.each {|component| load(component)}
   end
 end
